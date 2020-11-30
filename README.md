@@ -1,10 +1,10 @@
 ## Inicio e fim do programa
 
-BEGIN::
+_BEGIN::_
 
 // bloco de codigos
 
-END::
+_END::_
 
 ## Comentários
 
