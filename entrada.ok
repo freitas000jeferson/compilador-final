@@ -1,0 +1,13 @@
+BEGIN::
+var num1
+var num2
+
+	
+	ins (num1)
+	outs (num1)
+	
+	in (num2)
+	out (num2)
+
+END::
+
