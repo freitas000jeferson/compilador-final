@@ -1,26 +1,47 @@
-%{
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <string.h>	
+#include <string.h>
 
-typedef struct vars { //estrutura de uma variável
+//nodetype variáveis
+
+//1 - números
+//2 - string
+//3 - vetor
+
+typedef struct vars
+{ //estrutura de uma variável
+    int nodetype;
     char name[50];
     double valor;
     char valors[50];
+    double *vet;
     struct vars *prox;
 } VARI;
 
 //insere uma nova variável na lista de variáveis
-VARI *ins(VARI *l, char n[]) {
+VARI *ins(VARI *l, char n[])
+{
     VARI *new = (VARI *)malloc(sizeof(VARI));
     strcpy(new->name, n);
     new->prox = l;
+    new->nodetype = 1;
+    return new;
+}
+
+VARI *ins_a(VARI *l, char n[], int tamanho)
+{
+    VARI *new = (VARI *)malloc(sizeof(VARI));
+    strcpy(new->name, n);
+    new->vet = (double *)malloc(tamanho * sizeof(double));
+    new->prox = l;
+    new->nodetype = 3;
     return new;
 }
 
 //busca uma variável na lista de variáveis
-VARI *srch(VARI *l, char n[]) {
+VARI *srch(VARI *l, char n[])
+{
     VARI *aux = l;
     while (aux != NULL)
     {
@@ -32,20 +53,24 @@ VARI *srch(VARI *l, char n[]) {
 }
 
 /*O node type serve para indicar o tipo de nó que está na árvore. Isso serve para a função eval() entender o que realizar naquele nó*/
-typedef struct ast { /*Estrutura de um nó*/
+typedef struct ast
+{ /*Estrutura de um nó*/
     int nodetype;
     struct ast *l; /*Esquerda*/
     struct ast *r; /*Direita*/
 } Ast;
 
-typedef struct numval { /*Estrutura de um número*/
+typedef struct numval
+{ /*Estrutura de um número*/
     int nodetype;
     double number;
 } Numval;
 
-typedef struct varval { /*Estrutura de um nome de variável, nesse exemplo uma variável é um número no vetor var[26]*/
+typedef struct varval
+{ /*Estrutura de um nome de variável, nesse exemplo uma variável é um número no vetor var[26]*/
     int nodetype;
     char var[50];
+    int size;
 } Varval;
 
 typedef struct texto
@@ -67,8 +92,8 @@ typedef struct symasgn
     int nodetype;
     char s[50];
     Ast *v;
+    int pos;
 } Symasgn;
-
 
 VARI *l1; /*Variáveis*/
 VARI *aux;
@@ -99,6 +124,21 @@ Ast *newvari(int nodetype, char nome[50])
     a->nodetype = nodetype;
     ;
     strcpy(a->var, nome);
+    return (Ast *)a;
+}
+
+Ast *newarray(int nodetype, char nome[50], int tam)
+{ /*Função de que cria uma nova variável*/
+    Varval *a = (Varval *)malloc(sizeof(Varval));
+    if (!a)
+    {
+        printf("out of space");
+        exit(0);
+    }
+    a->nodetype = nodetype;
+    ;
+    strcpy(a->var, nome);
+    a->size = tam;
     return (Ast *)a;
 }
 
@@ -167,8 +207,23 @@ Ast *newasgn(char s[50], Ast *v)
     }
     a->nodetype = '=';
     strcpy(a->s, s);
-    //a->s = s; /*Símbolo/variável*/
     a->v = v; /*Valor*/
+    //printf ("aqui:%lf\n",((VARI*)a->v)->valor);
+    return (Ast *)a;
+}
+
+Ast *newasgn_a(char s[50], Ast *v, int indice)
+{ /*Função para um nó de atribuição*/
+    Symasgn *a = (Symasgn *)malloc(sizeof(Symasgn));
+    if (!a)
+    {
+        printf("out of space");
+        exit(0);
+    }
+    a->nodetype = '=';
+    strcpy(a->s, s);
+    a->v = v; /*Valor*/
+    a->pos = indice;
     return (Ast *)a;
 }
 
@@ -183,6 +238,21 @@ Ast *newValorVal(char s[])
     }
     a->nodetype = 'N';
     strcpy(a->var, s);
+    return (Ast *)a;
+}
+
+Ast *newValorVal_a(char s[], int indice)
+{ /*Função que recupera o nome/referência de uma variável, neste caso o número*/
+    Varval *a = (Varval *)malloc(sizeof(Varval));
+    if (!a)
+    {
+        printf("out of space");
+        exit(0);
+    }
+    a->nodetype = 'n';
+    strcpy(a->var, s);
+    a->size = indice;
+
     return (Ast *)a;
 }
 
@@ -241,6 +311,13 @@ double eval(Ast *a)
         aux1 = srch(l1, ((Varval *)a)->var);
         v = aux1->valor;
         break;
+
+    case 'n':
+
+        aux1 = srch(l1, ((Varval *)a)->var);
+        v = aux1->vet[((Varval *)a)->size];
+        break;
+
     case '+':
         v = eval(a->l) + eval(a->r);
         break; /*Operações "árv esq   +   árv dir"*/
@@ -252,6 +329,12 @@ double eval(Ast *a)
         break; /*Operações*/
     case '/':
         v = eval(a->l) / eval(a->r);
+        break; /*Operações*/
+    case '^':
+        v = pow(eval(a->l), eval(a->r));
+        break; /*Operações*/
+    case '~':
+        v = pow(eval(a->l), (1 / eval(a->r)));
         break; /*Operações*/
     case 'M':
         v = -eval(a->l);
@@ -279,8 +362,16 @@ double eval(Ast *a)
     case '=':
         v = eval(((Symasgn *)a)->v); /*Recupera o valor*/
         aux = srch(l1, ((Symasgn *)a)->s);
-        aux->valor = v;
 
+        //printf ("AQUI %d\n",((Varval *)aux)->nodetype);
+
+        if (aux->nodetype == 1)
+        { //lembrar de verificar os demais tipos
+            aux->valor = v;
+            //printf ("%lf\n",v);
+        }
+        else
+            aux->vet[((Symasgn *)a)->pos] = v;
         break;
 
     case 'I': /*CASO IF*/
@@ -309,7 +400,6 @@ double eval(Ast *a)
         {
             while (eval(((Flow *)a)->cond) != 0)
             {
-                //printf ("VERDADE\n");
                 v = eval(((Flow *)a)->tl);
             }
         }
@@ -341,11 +431,13 @@ double eval(Ast *a)
         v2 = eval2(a->l); /*Recupera um valor STR*/
         printf("%s\n", v2);
         break; /*Função que imprime um valor (string)*/
-        printf("imprimiu\n");
         break;
 
     case 'V':
         l1 = ins(l1, ((Varval *)a)->var);
+        break;
+    case 'a':
+        l1 = ins_a(l1, ((Varval *)a)->var, ((Varval *)a)->size);
         break;
 
     default:
@@ -354,93 +446,3 @@ double eval(Ast *a)
     }
     return v;
 }
-
-
-
-int yylex();
-void yyerror (char *s){
-	printf("%s\n", s);
-}
-
-%}
-
-%union{
-	float flo;
-	int fn;
-	int inter;
-	char str[50];
-	Ast *a;
-	}
-
-%token <flo>NUM
-%token <str>VARS
-%token <str>TEXTO
-%token FIM INI IF ELSE WHILE PRINT DECL SCAN PRINTT SCANS
-%token <fn> CMP
-
-%right '='
-%left '+' '-'
-%left '*' '/'
-%left CMP
-
-%type <a> exp list stmt prog exp1
-
-%nonassoc IFX NEG
-
-%%
-
-val: INI prog FIM
-	;
-
-prog: stmt 		{eval($1);}  /*Inicia e execução da árvore de derivação*/
-	| prog stmt {eval($2);}	 /*Inicia e execução da árvore de derivação*/
-	;
-	
-/*Funções para análise sintática e criação dos nós na AST*/	
-/*Verifique q nenhuma operação é realizada na ação semântica, apenas são criados nós na árvore de derivação com suas respectivas operações*/
-	
-stmt: IF '(' exp ')' '{' list '}' %prec IFX {$$ = newflow('I', $3, $6, NULL);}
-	| IF '(' exp ')' '{' list '}' ELSE '{' list '}' {$$ = newflow('I', $3, $6, $10);}
-	| WHILE '(' exp ')' '{' list '}' {$$ = newflow('W', $3, $6, NULL);}
-	| VARS '=' exp {$$ = newasgn($1,$3);}
-	| DECL VARS	{ $$ = newvari('V',$2);}
-	| PRINT '(' exp ')' { $$ = newast('P',$3,NULL);}
-	| PRINTT '(' exp1 ')' {$$ = newast('Y',$3,NULL);}
-	| SCAN '('VARS')'	{ $$ = newvari('S',$3);}
-	| SCANS '('VARS')'	{ $$ = newvari('T',$3);}
-
-	
-	;
-
-list:	  stmt{$$ = $1;}
-		| list stmt { $$ = newast('L', $1, $2);	}
-		;
-	
-exp: 
-	 exp '+' exp {$$ = newast('+',$1,$3);}		/*Expressões matemáticas*/
-	|exp '-' exp {$$ = newast('-',$1,$3);}
-	|exp '*' exp {$$ = newast('*',$1,$3);}
-	|exp '/' exp {$$ = newast('/',$1,$3);}
-	|exp CMP exp {$$ = newcmp($2,$1,$3);}		/*Testes condicionais*/
-	|'(' exp ')' {$$ = $2;}
-	|'-' exp %prec NEG {$$ = newast('M',$2,NULL);}
-	|NUM {$$ = newnum($1);}						/*token de um número*/
-	|VARS {$$ = newValorVal($1);}				/*token de uma variável*/
-
-	;
-
-exp1: 
-	VARS {$$ = newValorValS($1);}				
-	;
-%%
-
-#include "lex.yy.c"
-
-int main(){
-	yyin=fopen("entrada.ok","r");
-	yyparse();
-	yylex();
-	fclose(yyin);
-return 0;
-}
-
