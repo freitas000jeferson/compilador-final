@@ -7,5 +7,9 @@ END::
 ## Comentários
 
 // unica linha
+
 /\*\*
-multiplas linhas \* /
+
+multiplas linhas
+
+\* /
