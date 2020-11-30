@@ -1,17 +1,13 @@
 ## Inicio e fim do programa
 
-_BEGIN::_
+**BEGIN::**
 
 // bloco de codigos
 
-_END::_
+**END::**
 
 ## Comentários
 
-// unica linha
+**// unica linha**
 
-/\*\*
-
-multiplas linhas
-
-\* /
+**/\*\* multiplas linhas \* /**
