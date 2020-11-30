@@ -8,6 +8,6 @@
 
 ## Comentários
 
-**// unica linha**
+// unica linha
 
-**/\*\* multiplas linhas \* /**
+/** multiplas linhas */
