@@ -1,3 +1,6 @@
+# PROGRAMA: OK
+#### extensão: .ok
+
 ## Inicio e fim do programa
 
 **BEGIN::**
@@ -8,6 +11,11 @@
 
 ## Comentários
 
-**// unica linha**
+// unica linha
 
-**/\*\* multiplas linhas \* /**
+/** multiplas linhas */
+
+## Tipos de variáveis
+  *int i;
+  *float f;
+  *string s;
