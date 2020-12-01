@@ -23,10 +23,12 @@ IF "IF"
 ELSE "ELSE"
 WHILE "WHILE"
 OUT "out"
-PRINTT "outs"
+PRINTT "print"
 IN "in"
 SCANS "ins"
 STR ["][^"]*["]
+ENDL "endl::"
+
 COMENTARIO "//"
 IGNORE [\s\t\n" "]
 
@@ -46,6 +48,7 @@ IGNORE [\s\t\n" "]
 {INT} {		return INT;			}
 {FLOAT} {	return FLOAT;		}
 {SQRT} {    return SQRT;     	}
+{ENDL} {    return ENDL;     	}
 
 {VARS} {
 	strcpy(yylval.str,yytext);
@@ -57,6 +60,7 @@ IGNORE [\s\t\n" "]
     strncpy ( aux, &yytext[1], strlen(yytext)-2);
     aux[strlen(yytext)-2]='\0';
     strcpy (yylval.str, aux);
+	// printf("\n___________LEU_____________%s",yytext);
 	return STR;  
 }
 
@@ -66,7 +70,7 @@ IGNORE [\s\t\n" "]
 	return NUM;
 	}
 
-[-+()=/*^,{};:"\[\]] {return *yytext;
+[-+()=/*^,{};:\[\]] {return *yytext;
 			}
 {COMENTARIO}..*|"/**"(..*|{IGNORE})*"*/" { ; }
 

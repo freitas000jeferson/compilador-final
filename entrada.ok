@@ -1,10 +1,69 @@
 BEGIN::
-	float i;
-	float x[3];
-	x[0]=10;
-	out(x[0]);
-	i=2;
-	i=1+i;
-	out(sqrt(8,i));
+	float MAX=3;
+	out(100);
+	//float vet[3];
+	
+	//vet[0]=10;
+	//vet[1]=20;
+	out(100);
+	print (  "a", "babbbab" );
+	print ( 100,"d->", MAX," \n", (10-9), " ");
+	print(endl::, endl::, endl::, 10, "as", endl:: , endl::);
+	float a = 10;
+	
 END::
+/**
+	vet[2]=30;
+	out(vet[0]);
+	out(vet[1]);
+	out(vet[2]);
+	*/
+	/**
+	float MAX=3;
+	float x=MAX;
+	float vet[x];
+	float i=0;
+	float aux;
+	while(i < MAX) {
+		in(aux);
+		vet[i] = aux;
+		//out(vet[i]);
+		i = 1+i;
+	}
+	i=0;
+		out(vet[i]);
+	i=1;
+		out(vet[i]);
+	i=2;
+		out(vet[i]);
+	i=0;
+	while(i < MAX) {
+		//out(vet[i]);
+		i = 1+i;
+	}
+*/
+/**
+float x=10;
+	out(x);
+	float a, b, c;
+	a=1;
+	b=2;
+	c=3;
+	out(a);out(b);out(c);
 
+--------
+
+	float x;
+	x=1;
+	while(x<=10){
+		out(x);
+		x=1+x;
+	}
+	out(0);
+	float i;
+	float a, b, c;
+	c=1;
+	//out(a);
+	out(1);
+
+*/
