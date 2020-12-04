@@ -497,8 +497,8 @@ static const yytype_uint8 yyrline[] =
       78,    80,    81,    84,    85,    89,    90,    91,    92,    93,
       94,    95,    96,    97,    98,    99,   100,   101,   109,   110,
      111,   113,   114,   115,   116,   120,   121,   123,   124,   126,
-     127,   131,   132,   133,   134,   135,   137,   138,   139,   140,
-     141
+     127,   132,   133,   134,   135,   136,   138,   139,   140,   141,
+     142
 };
 #endif
 
@@ -1764,7 +1764,7 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 101 "sintatico.y"
-    {(yyval.a) = newValorVal_a((yyvsp[(1) - (4)].str),(yyvsp[(3) - (4)].a));;}
+    {(yyval.a) = newValorVal_a((yyvsp[(1) - (4)].str), (yyvsp[(3) - (4)].a));;}
     break;
 
   case 38:
@@ -1861,70 +1861,70 @@ yyreduce:
   case 51:
 
 /* Line 1455 of yacc.c  */
-#line 131 "sintatico.y"
+#line 132 "sintatico.y"
     {  (yyval.a) = newast('s', newValorValS((yyvsp[(1) - (1)].str)), NULL);;}
     break;
 
   case 52:
 
 /* Line 1455 of yacc.c  */
-#line 132 "sintatico.y"
+#line 133 "sintatico.y"
     { (yyval.a) = newast('p',(yyvsp[(2) - (2)].a),NULL);;}
     break;
 
   case 53:
 
 /* Line 1455 of yacc.c  */
-#line 133 "sintatico.y"
+#line 134 "sintatico.y"
     { (yyval.a) = newast('u',(yyvsp[(2) - (2)].a),NULL);;}
     break;
 
   case 54:
 
 /* Line 1455 of yacc.c  */
-#line 134 "sintatico.y"
+#line 135 "sintatico.y"
     { (yyval.a) = searchVar('z', (yyvsp[(2) - (2)].str)); ;}
     break;
 
   case 55:
 
 /* Line 1455 of yacc.c  */
-#line 135 "sintatico.y"
+#line 136 "sintatico.y"
     { (yyval.a) = newast('e', newendl('e'), NULL); ;}
     break;
 
   case 56:
 
 /* Line 1455 of yacc.c  */
-#line 137 "sintatico.y"
+#line 138 "sintatico.y"
     { (yyval.a) = newast('r', newValorValS((yyvsp[(3) - (3)].str)), (yyvsp[(1) - (3)].a)); ;}
     break;
 
   case 57:
 
 /* Line 1455 of yacc.c  */
-#line 138 "sintatico.y"
+#line 139 "sintatico.y"
     { (yyval.a) = newast('q', newast('p', (yyvsp[(4) - (4)].a),NULL), (yyvsp[(1) - (4)].a)); ;}
     break;
 
   case 58:
 
 /* Line 1455 of yacc.c  */
-#line 139 "sintatico.y"
+#line 140 "sintatico.y"
     { (yyval.a) = newast('v', newast('u', (yyvsp[(4) - (4)].a),NULL), (yyvsp[(1) - (4)].a)); ;}
     break;
 
   case 59:
 
 /* Line 1455 of yacc.c  */
-#line 140 "sintatico.y"
+#line 141 "sintatico.y"
     { (yyval.a) = newast('y', searchVar('z', (yyvsp[(4) - (4)].str)), (yyvsp[(1) - (4)].a)); ;}
     break;
 
   case 60:
 
 /* Line 1455 of yacc.c  */
-#line 141 "sintatico.y"
+#line 142 "sintatico.y"
     { (yyval.a) = newast('f', newendl('e'), (yyvsp[(1) - (3)].a));  ;}
     break;
 
@@ -2143,16 +2143,16 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 143 "sintatico.y"
+#line 144 "sintatico.y"
 
 
 #include "lex.yy.c"
 
 int main(){
 	// yyin=fopen("entrada.ok","r");
-	//yyin=fopen("juros.ok","r");
+	yyin=fopen("juros.ok","r");
     //yyin=fopen("fibonacci.ok","r");
-	yyin=fopen("media.ok","r");
+	//yyin=fopen("media.ok","r");
 	yyparse();
 	yylex();
 	fclose(yyin);

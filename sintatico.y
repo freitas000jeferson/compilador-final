@@ -4,7 +4,9 @@
 #include <math.h>
 #include <string.h>	
 #include "structs.h"
-
+/**
+BY JEFERSON
+*/ 
 
 int yylex();
 void yyerror (char *s){
@@ -147,9 +149,9 @@ multout:  STR  {  $$ = newast('s', newValorValS($1), NULL);}
 
 int main(){
 	// yyin=fopen("entrada.ok","r");
-	//yyin=fopen("juros.ok","r");
+	yyin=fopen("juros.ok","r");
     //yyin=fopen("fibonacci.ok","r");
-	yyin=fopen("media.ok","r");
+	//yyin=fopen("media.ok","r");
 	yyparse();
 	yylex();
 	fclose(yyin);

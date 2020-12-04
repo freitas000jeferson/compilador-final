@@ -9,7 +9,7 @@ print("nota da n1: ");
 in([f::] n1);
 print("nota da n2: ");
 in([f::] n2);
-string str;
+// string str;
 // copy(str, [i::](2 * n1 + 3 * n2) / 5);
 // print(">>>>", [s::] str, endl::);
 media = (2 * n1 + 3 * n2) / 5;

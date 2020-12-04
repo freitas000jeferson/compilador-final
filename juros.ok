@@ -5,7 +5,7 @@ BEGIN::
 print("=================", endl::,
       "Problema de juros", endl::,
       "=================", endl::);
-print("capita: ");
+print("capital: ");
 in([f::] c);
 print("tempo(meses): ");
 in([f::] t);
