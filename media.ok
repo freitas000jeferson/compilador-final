@@ -1,0 +1,30 @@
+BEGIN::
+    float media,
+    n1,
+    n2;
+print("=================", endl::,
+      "Media de Notas", endl::,
+      "=================", endl::);
+print("nota da n1: ");
+in([f::] n1);
+print("nota da n2: ");
+in([f::] n2);
+media = (2 * n1 + 3 * n2) / 5;
+print("Sua media final foi: ", [f::] media, endl::);
+if (media >= 7)
+{
+    print("Aprovado!");
+}
+else
+{
+    if (media >= 4)
+    {
+        print("Recuperacao!");
+    }
+    else
+    {
+        print("Reprovado!");
+    }
+}
+print(endl::);
+END::

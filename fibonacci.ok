@@ -1,7 +1,9 @@
+
 BEGIN::
 
-    float c,
+float c,
     a, b, i, aux;
+
 print("=================", endl::,
       "Fibonacci", endl::,
       "=================", endl::);
@@ -19,7 +21,6 @@ while (i < c)
     a = aux;
     i = 1 + i;
 }
-
 print(endl::);
 
 END::
