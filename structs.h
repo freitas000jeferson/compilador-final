@@ -409,7 +409,7 @@ double evalAux(Ast *a)
         v = evalAux(a->l) / evalAux(a->r);
         break; /*Operações*/
     case '%':
-        v = evalAux(a->l) % evalAux(a->r);
+        v = ((int)evalAux(a->l)) % ((int)evalAux(a->r));
         break; /*Operações*/
     case '^':
         v = pow(evalAux(a->l), evalAux(a->r));
@@ -569,10 +569,8 @@ double eval(Ast *a)
         v = eval(((Symasgn *)a)->v); /*Recupera o valor*/
         aux = srch(l1, ((Symasgn *)a)->s);
         // printf(" aqui : %lf\n", v);
-
         // printf("AQUI %d\n", ((Varval *)aux)->nodetype);
-
-        if (aux->nodetype == 1)
+        if (aux->nodetype == 1 || aux->nodetype == 0)
         { //lembrar de verificar os demais tipos
             aux->valor = v;
         }

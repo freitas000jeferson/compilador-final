@@ -9,6 +9,9 @@ print("nota da n1: ");
 in([f::] n1);
 print("nota da n2: ");
 in([f::] n2);
+string str;
+// copy(str, [i::](2 * n1 + 3 * n2) / 5);
+// print(">>>>", [s::] str, endl::);
 media = (2 * n1 + 3 * n2) / 5;
 print("Sua media final foi: ", [f::] media, endl::);
 if (media >= 7)
@@ -27,4 +30,13 @@ else
     }
 }
 print(endl::);
+
 END::
+    /**
+    a
+l     r
+v      a
+    l       r
+    v       a
+
+    */

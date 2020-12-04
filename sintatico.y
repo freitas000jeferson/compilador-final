@@ -98,7 +98,7 @@ exp:
 	|'-' exp %prec NEG {$$ = newast('M',$2,NULL);}
 	|NUM 	{$$ = newnum($1);}						/*token de um número*/
 	|VARS 	%prec VET {$$ = newValorVal($1);}		/*token de uma variável*/
-	|VARS '[' exp ']' {$$ = newValorVal_a($1,$3);}				/*token de uma variável*/
+	|VARS '[' exp ']' {$$ = newValorVal_a($1, $3);}				/*token de uma variável*/
 
 	;
 
@@ -126,6 +126,7 @@ multvari: VARS { $$ = newvari('U',$1); }
 multvars: VARS { $$ = newvari('X',$1); }
         | multvars ',' VARS { $$ = newast('h', newvari('X',$3) , $1); }
         ;
+
 
 
 multout:  STR  {  $$ = newast('s', newValorValS($1), NULL);}
