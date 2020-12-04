@@ -1,0 +1,19 @@
+BEGIN::
+    float c,
+    m, j,
+    t, i;
+print("=================", endl::,
+      "Problema de juros", endl::,
+      "=================", endl::);
+print("capita: ");
+in([f::] c);
+print("tempo(meses): ");
+in([f::] t);
+print("taxa (por mes): ");
+in([f::] i);
+j = (c * t * (i / 100));
+m = c + j;
+print("=>Juros simples: ", [f::] j, endl::);
+print("=>Montante: ", [f::] m, endl::);
+
+END::

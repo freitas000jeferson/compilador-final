@@ -1,18 +1,74 @@
 BEGIN::
-	float MAX=3;
+	int MAX = 4;
+float vet[10];
+vet[0] = 2;
+vet[1] = 12;
+vet[2] = 22;
+vet[3] = 32;
+float i = 0;
+// i = 1 + i;
+// print(f::vet[i + 1], " ");
+// print(f::vet[1], " ");
+// print(f::vet[vet[0]], " ");
+// print(f::i);
+while (i < MAX)
+{
+	print([f::] vet[i], " ", endl::);
+	i = 1 + i;
+}
+END::
+	/**
+ * 
+ * print(i::10, endl::);
+string s = "texto: testando texto";
+float x1 = 10;
+string x2 = "variavel";
+int x3 = 10;
+print("digite x1: ");
+in(f::x1);
+print("= ", f::x1, endl::);
+
+print("digite s: ");
+in(s::s);
+
+print("1) ", s::s, "  ", s::x2, endl::);
+
+copy(s, "ok");
+print("2) ", s::s, "  ", s::x2, endl::);
+
+copy(s, f::(10 - 11));
+print("3) ", s::s, "  ", s::x2, endl::);
+copy(s, f::x1);
+print("4) ", s::s, "  ", s::x2, endl::);
+copy(s, i::(12 - x1));
+print("5) ", s::s, "  ", s::x2, endl::);
+copy(s, s::x2);
+print("6) ", s::s, "  ", s::x2, endl::);
+concat(s, s::x2);
+print("7) ", s::s, "  ", s::x2, endl::);
+print(endl::, "<fim>");
+// print(s::s, "  ", s::x2, endl::);
+// print(s::s, "  ", s::x2, endl::);
+
+// concat(s, "ok");
+*/
+
+	/**
+float MAX=3;
 	out(100);
-	//float vet[3];
-	
-	//vet[0]=10;
-	//vet[1]=20;
-	out(100);
-	print (  "a", "babbbab" );
-	print ( 100,"d->", MAX," \n", (10-9), " ");
-	print(endl::, endl::, endl::, 10, "as", endl:: , endl::);
+	float vet[3];
 	float a = 10;
 	
-END::
-/**
+	vet[0]=10.10;
+	vet[1]=20;
+	out(100);
+	print (  i:: vet[0], " ", f:: vet[1], "texto grande", endl:: );
+	print ( i::100, " variavel->", i::MAX, " \n", i::(10-9), " ");
+	print(endl::, f::10, " as");
+	
+*/
+
+	/**
 	vet[2]=30;
 	out(vet[0]);
 	out(vet[1]);
@@ -42,7 +98,7 @@ END::
 		i = 1+i;
 	}
 */
-/**
+	/**
 float x=10;
 	out(x);
 	float a, b, c;

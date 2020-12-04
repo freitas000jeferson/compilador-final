@@ -22,12 +22,15 @@ SQRT "sqrt"
 IF "IF"
 ELSE "ELSE"
 WHILE "WHILE"
-OUT "out"
-PRINTT "print"
+PRINT "print"
 IN "in"
-SCANS "ins"
 STR ["][^"]*["]
 ENDL "endl::"
+DI "[i::]"
+DF "[f::]"
+DS "[s::]"
+CONCAT "concat"
+COPY "copy"
 
 COMENTARIO "//"
 IGNORE [\s\t\n" "]
@@ -39,17 +42,20 @@ IGNORE [\s\t\n" "]
 {IF} {		return IF;			}
 {ELSE} {	return ELSE;		}
 {WHILE} {	return WHILE;		}
-{PRINTT} {	return PRINTT;		}
-{OUT} {		return OUT;			}
+{PRINT} {	return PRINTT;		}
 {IN} {		return IN;			}
-{SCANS} {	return SCANS;		}
+{CONCAT} {  return CONCAT;     	}
+{COPY} {  return COPY;     	}
+
 {DECL} {	return DECL;		}
 {STRING} {	return STRING;		}
 {INT} {		return INT;			}
 {FLOAT} {	return FLOAT;		}
 {SQRT} {    return SQRT;     	}
 {ENDL} {    return ENDL;     	}
-
+{DI} {    	return DI;    	 	}
+{DF} {    	return DF;    	 	}
+{DS} {    	return DS;    	 	}
 {VARS} {
 	strcpy(yylval.str,yytext);
 	return VARS;
@@ -70,7 +76,7 @@ IGNORE [\s\t\n" "]
 	return NUM;
 	}
 
-[-+()=/*^,{};:\[\]] {return *yytext;
+[-+()=%/*^,{};:\[\]] {return *yytext;
 			}
 {COMENTARIO}..*|"/**"(..*|{IGNORE})*"*/" { ; }
 

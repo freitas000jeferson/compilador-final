@@ -1,0 +1,25 @@
+BEGIN::
+
+    float c,
+    a, b, i, aux;
+print("=================", endl::,
+      "Fibonacci", endl::,
+      "=================", endl::);
+print("fibonacci ate quanto: ");
+in([f::] c);
+i = 0;
+a = 0;
+b = 1;
+aux = 0;
+while (i < c)
+{
+    print([i::] b, " ");
+    aux = b;
+    b = b + a;
+    a = aux;
+    i = 1 + i;
+}
+
+print(endl::);
+
+END::

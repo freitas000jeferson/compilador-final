@@ -13,13 +13,13 @@ typedef struct vars
     int nodetype;
     char name[50];
     double valor;
-    char valors[50];
+    char valors[1000];
     double *vet;
     struct vars *prox;
 } VARI;
 
 //insere uma nova variável na lista de variáveis
-VARI *ins(VARI *l, char n[])
+VARI *ins_f(VARI *l, char n[])
 {
     VARI *new = (VARI *)malloc(sizeof(VARI));
     strcpy(new->name, n);
@@ -27,10 +27,25 @@ VARI *ins(VARI *l, char n[])
     new->nodetype = 1;
     return new;
 }
+VARI *ins_i(VARI *l, char n[])
+{
+    VARI *new = (VARI *)malloc(sizeof(VARI));
+    strcpy(new->name, n);
+    new->prox = l;
+    new->nodetype = 0;
+    return new;
+}
+VARI *ins_s(VARI *l, char n[])
+{
+    VARI *new = (VARI *)malloc(sizeof(VARI));
+    strcpy(new->name, n);
+    new->prox = l;
+    new->nodetype = 2;
+    return new;
+}
 
 VARI *ins_a(VARI *l, char n[], int tamanho)
 {
-    // printf("->%d\n", tamanho);
     VARI *new = (VARI *)malloc(sizeof(VARI));
     strcpy(new->name, n);
     new->vet = (double *)malloc(tamanho * sizeof(double));
@@ -77,6 +92,7 @@ typedef struct varval
     int nodetype;
     char var[50];
     int size;
+    Ast *length;
 } Varval;
 
 typedef struct texto
@@ -99,6 +115,7 @@ typedef struct symasgn
     char s[50];
     Ast *v;
     int pos;
+    Ast *indice;
 } Symasgn;
 
 VARI *l1; /*Variáveis*/
@@ -145,7 +162,7 @@ Ast *newvari(int nodetype, char nome[50])
     return (Ast *)a;
 }
 
-Ast *newarray(int nodetype, char nome[50], double tam)
+Ast *newarray(int nodetype, char nome[50], Ast *tam)
 { /*Função de que cria uma nova variável*/
     Varval *a = (Varval *)malloc(sizeof(Varval));
     if (!a)
@@ -160,20 +177,8 @@ Ast *newarray(int nodetype, char nome[50], double tam)
     // VARI *aux1 = srch(l1, ((Varval *)tam)->var);
     // printf("%.1lf - %.1lf \n", v, aux1->valor);
 
-    a->size = (int)tam; // aux1->valor;
-    return (Ast *)a;
-}
-
-Ast *newtext(int nodetype, char txt[500])
-{ /*Função de que cria uma nova variável*/
-    TXT *a = (TXT *)malloc(sizeof(TXT));
-    if (!a)
-    {
-        printf("out of space");
-        exit(0);
-    }
-    a->nodetype = nodetype;
-    strcpy(a->txt, txt);
+    // a->size = (int)tam; // aux1->valor;
+    a->length = tam;
     return (Ast *)a;
 }
 
@@ -235,7 +240,7 @@ Ast *newasgn(char s[50], Ast *v)
     return (Ast *)a;
 }
 
-Ast *newasgn_a(char s[50], Ast *v, double indice)
+Ast *newasgn_a(char s[50], Ast *v, Ast *indice)
 { /*Função para um nó de atribuição*/
     Symasgn *a = (Symasgn *)malloc(sizeof(Symasgn));
     if (!a)
@@ -247,7 +252,38 @@ Ast *newasgn_a(char s[50], Ast *v, double indice)
     strcpy(a->s, s);
     a->v = v; /*Valor*/
     // VARI *aux1 = srch(l1, ((Varval *)indice)->var);
-    a->pos = (int)indice;
+    a->indice = indice;
+    return (Ast *)a;
+}
+
+Ast *newasgn_concat(char s[50], Ast *v)
+{ /*Função para um nó de atribuição*/
+    Symasgn *a = (Symasgn *)malloc(sizeof(Symasgn));
+    if (!a)
+    {
+        printf("out of space");
+        exit(0);
+    }
+    a->nodetype = '#';
+    strcpy(a->s, s);
+    a->v = v; /*Valor*/
+    // printf("passou %s", a->s);
+    //printf ("aqui:%lf\n",((VARI*)a->v)->valor);
+    return (Ast *)a;
+}
+Ast *newasgn_copy(char s[50], Ast *v)
+{ /*Função para um nó de atribuição*/
+    Symasgn *a = (Symasgn *)malloc(sizeof(Symasgn));
+    if (!a)
+    {
+        printf("out of space");
+        exit(0);
+    }
+    a->nodetype = '@';
+    strcpy(a->s, s);
+    a->v = v; /*Valor*/
+    // printf("passou %s<\n", a->s);
+    //printf ("aqui:%lf\n",((VARI*)a->v)->valor);
     return (Ast *)a;
 }
 
@@ -265,7 +301,7 @@ Ast *newValorVal(char s[])
     return (Ast *)a;
 }
 
-Ast *newValorVal_a(char s[], double indice)
+Ast *newValorVal_a(char s[], Ast *indice)
 { /*Função que recupera o nome/referência de uma variável, neste caso o número*/
     Varval *a = (Varval *)malloc(sizeof(Varval));
     if (!a)
@@ -275,10 +311,8 @@ Ast *newValorVal_a(char s[], double indice)
     }
     a->nodetype = 'n';
     strcpy(a->var, s);
-
     // VARI *aux1 = srch(l1, ((Varval *)indice)->var);
-
-    a->size = (int)indice;
+    a->length = indice;
     return (Ast *)a;
 }
 
@@ -293,6 +327,21 @@ Ast *newValorValS(char s[50])
     a->nodetype = 'Q';
     // printf("%s", s);
     strcpy(a->var, s);
+    // printf("CRIOU %s\n", s);
+    return (Ast *)a;
+}
+
+Ast *searchVar(int nodetype, char s[50])
+{
+    Symasgn *a = (Symasgn *)malloc(sizeof(Symasgn));
+    if (!a)
+    {
+        printf("out of space");
+        exit(0);
+    }
+    a->nodetype = nodetype;
+    // printf("%s", s);
+    strcpy(a->s, s);
     // printf("CRIOU %s\n", s);
     return (Ast *)a;
 }
@@ -317,113 +366,10 @@ char *eval2(Ast *a)
     return v2;
 }
 
-double eval3(Ast *a)
+double evalAux(Ast *a)
 {
-    VARI *aux1;
-    char *v2;
-    double v, v1;
-    switch (a->nodetype)
-    {
-    case 'K':
-        v = ((Numval *)a)->valor;
-        break; /*Recupera um número*/
-    case 'N':
-        aux1 = srch(l1, ((Varval *)a)->var);
-        v = aux1->valor;
-        break;
-
-    case 'n':
-        aux1 = srch(l1, ((Varval *)a)->var);
-        v = aux1->vet[((Varval *)a)->size];
-        break;
-
-    case '+':
-        v = eval3(a->l) + eval3(a->r);
-        break; /*Operações "árv esq   +   árv dir"*/
-    case '-':
-        v = eval3(a->l) - eval3(a->r);
-        break; /*Operações*/
-    case '*':
-        v = eval3(a->l) * eval3(a->r);
-        break; /*Operações*/
-    case '/':
-        v = eval3(a->l) / eval3(a->r);
-        break; /*Operações*/
-    case '^':
-        v = pow(eval3(a->l), eval3(a->r));
-        break; /*Operações*/
-    case '~':
-        v = pow(eval3(a->l), (1 / eval3(a->r)));
-        break; /*Operações*/
-    case 'M':
-        v = -eval3(a->l);
-        break; /*Operações, número negativo*/
-
-    case '1':
-        v = (eval3(a->l) > eval3(a->r)) ? 1 : 0;
-        break; /*Operações lógicas. "árv esq   >   árv dir"  Se verdade 1, falso 0*/
-    case '2':
-        v = (eval3(a->l) < eval3(a->r)) ? 1 : 0;
-        break;
-    case '3':
-        v = (eval3(a->l) != eval3(a->r)) ? 1 : 0;
-        break;
-    case '4':
-        v = (eval3(a->l) == eval3(a->r)) ? 1 : 0;
-        break;
-    case '5':
-        v = (eval3(a->l) >= eval3(a->r)) ? 1 : 0;
-        break;
-    case '6':
-        v = (eval3(a->l) <= eval3(a->r)) ? 1 : 0;
-        break;
-    case 'Q':
-        // aux1 = srch(l1, ((Varval *)a)->var);
-        // v2 = aux1->valors;
-        // printf("%s", v2);
-        break;
-
-    case 'y':
-        eval3(a->r);
-        eval3(a->l);
-        /*Recupera um valor STR*/
-        // printf("->%.2lf", v1);
-        // strcat($1, $2);
-        break; /*Função que imprime um valor (string)*/
-
-    case 'p':
-        v1 = eval3(a->l); /*Recupera um valor STR*/
-        printf("%.2lf", v1);
-        break;
-
-    case 'r':
-        eval3(a->r);
-        printf("%s", ((Varval *)a->l)->var);
-        break;
-    case 't':
-        printf("%s", ((Varval *)a->l)->var);
-        break;
-
-    case 'l':
-        // printf("\n<aqui l>\n");
-        eval3(a->r);
-        printf("\n");
-        break;
-
-    case 'e':
-        // printf("\n<aqui e>\n");
-        printf("\n");
-        break;
-
-    default:
-        printf("EVAL3: internal error: bad node %c\n", a->nodetype);
-        break;
-    }
-    return v;
-}
-double eval(Ast *a)
-{ /*Função que executa operações a partir de um nó*/
     double v;
+    double value;
     char v1[50];
     char *v2;
     VARI *aux1;
@@ -439,12 +385,137 @@ double eval(Ast *a)
         break; /*Recupera um número*/
     case 'N':
         aux1 = srch(l1, ((Varval *)a)->var);
-        v = aux1->valor;
+        if (aux1->nodetype == 1 || aux1->nodetype == 0)
+            v = aux1->valor;
+        else
+            printf("Variável não é do tipo Numérico\n");
         break;
 
     case 'n':
         aux1 = srch(l1, ((Varval *)a)->var);
         v = aux1->vet[((Varval *)a)->size];
+        break;
+
+    case '+':
+        v = evalAux(a->l) + evalAux(a->r);
+        break; /*Operações "árv esq   +   árv dir"*/
+    case '-':
+        v = evalAux(a->l) - evalAux(a->r);
+        break; /*Operações*/
+    case '*':
+        v = evalAux(a->l) * evalAux(a->r);
+        break; /*Operações*/
+    case '/':
+        v = evalAux(a->l) / evalAux(a->r);
+        break; /*Operações*/
+    case '^':
+        v = pow(evalAux(a->l), evalAux(a->r));
+        break; /*Operações*/
+    case '~':
+        v = pow(evalAux(a->l), (1 / evalAux(a->r)));
+        break; /*Operações*/
+    case 'M':
+        v = -evalAux(a->l);
+        break; /*Operações, número negativo*/
+
+    case '1':
+        v = (evalAux(a->l) > evalAux(a->r)) ? 1 : 0;
+        break; /*Operações lógicas. "árv esq   >   árv dir"  Se verdade 1, falso 0*/
+    case '2':
+        v = (evalAux(a->l) < evalAux(a->r)) ? 1 : 0;
+        break;
+    case '3':
+        v = (evalAux(a->l) != evalAux(a->r)) ? 1 : 0;
+        break;
+    case '4':
+        v = (evalAux(a->l) == evalAux(a->r)) ? 1 : 0;
+        break;
+    case '5':
+        v = (evalAux(a->l) >= evalAux(a->r)) ? 1 : 0;
+        break;
+    case '6':
+        v = (evalAux(a->l) <= evalAux(a->r)) ? 1 : 0;
+        break;
+    default:
+        printf("EVAL1: internal error: bad node %c\n", a->nodetype);
+        break;
+    }
+    return v;
+}
+
+char *parseSTR(Ast *a)
+{
+    // printf("PASSOU AQUI %c\n", a->nodetype);
+    char *v = (char *)malloc(1000 * sizeof(char));
+    double value;
+    VARI *aux1;
+    if (!a)
+    {
+        printf("internal error, null eval");
+        return NULL;
+    }
+    switch (a->nodetype)
+    {
+    case '$':
+        return ((Varval *)a->l)->var;
+        break;
+    case '7':
+        value = evalAux(a->l);
+        sprintf(v, "%.2lf", value);
+        break;
+    case '8':
+        value = evalAux(a->l);
+        sprintf(v, "%.0lf", value);
+        break;
+    case '9':
+        // printf("aqui=> %s\n", ((Symasgn *)(a->l))->s);
+        aux1 = srch(l1, ((Symasgn *)(a->l))->s);
+        // printf("nodetype: %d\n", aux1->nodetype);
+        if (aux1->nodetype == 2)
+            return aux1->valors;
+        else
+            printf("Variável não é do tipo String %c\n", a->nodetype);
+        break;
+    default:
+        printf("STRING: internal error: bad node %c\n", a->nodetype);
+        break;
+    }
+    return v;
+}
+
+double eval(Ast *a)
+{ /*Função que executa operações a partir de um nó*/
+    double v;
+    double value;
+    char v1[50];
+    char *v2;
+    VARI *aux1;
+    if (!a)
+    {
+        printf("internal error, null eval");
+        return 0.0;
+    }
+    switch (a->nodetype)
+    {
+    case 'K':
+        v = ((Numval *)a)->valor;
+        break; /*Recupera um número*/
+    case 'N':
+        aux1 = srch(l1, ((Varval *)a)->var);
+        // printf("entrou aqui %d<-\n", aux1->nodetype);
+        // value = (int)aux1->nodetype;
+        // printf("Passo: %lf", aux1->valor);
+        v = aux1->valor;
+        break;
+
+    case 'n':
+        aux1 = srch(l1, ((Varval *)a)->var);
+        // printf("==> %s", ((Varval *)a)->var);
+        // value = eval(((Varval *)a)->length);
+        value = eval(((Varval *)a)->length);
+        // printf(">>> %.1lf\n", value);
+        // printf("var: %s, id: %.0lf\n", ((Varval *)a)->var, value);
+        v = aux1->vet[(int)value];
         break;
 
     case '+':
@@ -459,6 +530,9 @@ double eval(Ast *a)
     case '/':
         v = eval(a->l) / eval(a->r);
         break; /*Operações*/
+    case '%':
+        v = (int)eval(a->l) % (int)eval(a->r);
+        break;
     case '^':
         v = pow(eval(a->l), eval(a->r));
         break; /*Operações*/
@@ -501,20 +575,14 @@ double eval(Ast *a)
         }
         else
         {
+            // ((Varval *)a)->length
+            // printf("=> %lf, %lf <== \n", ((Varval *)a)->length, ((Symasgn *)a)->indice);
+            value = eval(((Symasgn *)a)->indice);
+            // printf(">>> %.1lf\n", value);
             //printf("vetor: %d", ((Symasgn *)a)->pos);
-            aux->vet[((Symasgn *)a)->pos] = v;
+            aux->vet[(int)value] = v;
+            // printf("==%lf\n", aux->vet[(int)value]);
         }
-        break;
-
-    case 'D':
-        v = eval(a->r);
-        l1 = ins(l1, ((Symasgn *)(a->l))->s);
-        l1->valor = v;
-        break;
-
-    case 'd':
-        l1 = ins(l1, ((Symasgn *)(a->l))->s);
-        eval(a->r);
         break;
 
     case 'I': /*CASO IF*/
@@ -559,13 +627,17 @@ double eval(Ast *a)
         break; /*Função que imprime um valor*/
 
     case 'S':
+        fflush(stdin);
         scanf("%lf", &v);
+        fflush(stdin);
         aux1 = srch(l1, ((Varval *)a)->var);
         aux1->valor = v;
         break;
 
     case 'T':
-        scanf("%s", v1);
+        fflush(stdin);
+        scanf("%[^\n]s", v1);
+        fflush(stdin);
         aux1 = srch(l1, ((Varval *)a)->var);
         strcpy(aux1->valors, v1);
         break;
@@ -574,33 +646,147 @@ double eval(Ast *a)
         v2 = eval2(a->l); /*Recupera um valor STR*/
         printf("%s\n", v2);
         break; /*Função que imprime um valor (string)*/
-    case 'y':
-        eval3(a);
+
+    /** =========  Função que imprime um valor (string) ============ */
+    // subdivisao do float
+    case 'q':
+        eval(a->r);
+        eval(a->l);
+        /*Recupera um valor STR*/
+        // printf("->%.2lf", v1);
+        // strcat($1, $2);
         break; /*Função que imprime um valor (string)*/
     case 'p':
-        eval3(a);
-        break;
-    case 't':
-        eval3(a);
-        break;
-    case 'r':
-        eval3(a);
-        break;
-    case 'e':
-        eval3(a);
-        break;
-    case 'l':
-        eval3(a);
+        value = eval(a->l); /*Recupera um valor STR*/
+        printf("%.2lf", value);
         break;
 
-    case 'V':
-        l1 = ins(l1, ((Varval *)a)->var);
+    // subdivisao do int
+    case 'v':
+        eval(a->r);
+        eval(a->l);
+        /*Recupera um valor STR*/
+        // printf("->%.2lf", v1);
+        // strcat($1, $2);
+        break; /*Função que imprime um valor (string)*/
+    case 'u':
+        value = eval(a->l); /*Recupera um valor STR*/
+        printf("%d", (int)value);
+        break;
+
+    // subdivisao do "str"
+    case 'r':
+        eval(a->r);
+        printf("%s", ((Varval *)a->l)->var);
+        break;
+    case 's':
+        printf("%s", ((Varval *)a->l)->var);
+        break;
+
+    // subdivisao do string
+    case 'y':
+        // printf("Chegou aqui1: ");
+        // printf("%s\n", ((Symasgn *)(a->l))->s);
+        eval(a->r);
+        aux1 = srch(l1, ((Symasgn *)(a->l))->s);
+        // aux1 = srch(l1, ((Varval *)(a->l))->var);
+        // printf("nodetype: %d\n", aux1->nodetype);
+        if (aux1->nodetype == 2)
+            printf("%s", aux1->valors);
+        else
+            printf("Variável não é do tipo String %c\n", a->nodetype);
+        break;
+    case 'z':
+        // printf("Chegou aqui2: ");
+        // printf("%s - %s\n", ((Symasgn *)(a->l))->s, ((Varval *)a)->var);
+
+        aux1 = srch(l1, ((Varval *)a)->var);
+        // printf("nodetype: %d\n", aux1->nodetype);
+        if (aux1->nodetype == 2)
+            printf("%s", aux1->valors);
+        else
+            printf("Variável não é do tipo String %c\n", a->nodetype);
+        break;
+    // subdivisao do endl
+    case 'e':
+        printf("\n");
+        break;
+    case 'f':
+        eval(a->r);
+        printf("\n");
+        break;
+
+    // ------
+    case 'V': //float
+        l1 = ins_f(l1, ((Varval *)a)->var);
         // printf("entrou aqui:::%s\n", ((VARI *)l1)->name);
         break;
-    case 'a':
-        l1 = ins_a(l1, ((Varval *)a)->var, ((Varval *)a)->size);
+    case 'U': //int
+        l1 = ins_i(l1, ((Varval *)a)->var);
+        break;
+    case 'X': //string
+        // printf("criour var STR: %s\n", ((Varval *)a)->var);
+        l1 = ins_s(l1, ((Varval *)a)->var);
+        break;
+    case 'A': // vetor
+        value = eval(((Varval *)a)->length);
+        l1 = ins_a(l1, ((Varval *)a)->var, (int)value);
+        break;
+        // -----------
+
+    case 'D': //declarar e inserir float
+        v = eval(a->r);
+        l1 = ins_f(l1, ((Symasgn *)(a->l))->s);
+        l1->valor = v;
+        break;
+    case 'd': //declarar varios float
+        l1 = ins_f(l1, ((Symasgn *)(a->l))->s);
+        eval(a->r);
         break;
 
+    case 'G': //declarar e inserir int
+        v = eval(a->r);
+        l1 = ins_i(l1, ((Symasgn *)(a->l))->s);
+        l1->valor = v;
+        break;
+    case 'g': //declarar varios int
+        l1 = ins_i(l1, ((Symasgn *)(a->l))->s);
+        eval(a->r);
+        break;
+
+    case 'H': //declarar e inserir string
+        // printf("AQUI OOOHHH: %s, %s\n", ((Symasgn *)(a->l))->s, ((Varval *)a->r)->var);
+        l1 = ins_s(l1, (((Symasgn *)(a->l))->s));
+        strcpy(l1->valors, ((Varval *)a->r)->var);
+        break;
+    case 'h': //declarar varios string
+        l1 = ins_s(l1, ((Symasgn *)(a->l))->s);
+        eval(a->r);
+        break;
+    case '@':
+        v2 = parseSTR(((Symasgn *)a)->v);
+        // printf("=====> %s <======\n", v2);
+        aux1 = srch(l1, ((Symasgn *)a)->s);
+        // printf("@ copy:%s <- %s\n", ((Symasgn *)a)->s, v2);
+        if (aux1->nodetype == 2)
+            strcpy(aux1->valors, v2);
+        else
+            printf("Variável %s não é do tipo String \n", ((Symasgn *)a)->s);
+        // v = eval(((Symasgn *)a)->v); /*Recupera o valor*/
+        // concatenar
+        break;
+    case '#':
+        // printf("# rotas\n");
+        v2 = parseSTR(((Symasgn *)a)->v);
+        // printf("=====> %s <======\n", v2);
+        aux1 = srch(l1, ((Symasgn *)a)->s);
+        if (aux1->nodetype == 2)
+            strcat(aux1->valors, v2);
+        else
+            printf("Variável %s não é do tipo String \n", ((Symasgn *)a)->s);
+        // v = eval(((Symasgn *)a)->v); /*Recupera o valor*/
+        // concatenar
+        break;
     default:
         printf("EVAL1: internal error: bad node %c\n", a->nodetype);
         break;
