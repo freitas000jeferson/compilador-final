@@ -408,6 +408,9 @@ double evalAux(Ast *a)
     case '/':
         v = evalAux(a->l) / evalAux(a->r);
         break; /*Operações*/
+    case '%':
+        v = evalAux(a->l) % evalAux(a->r);
+        break; /*Operações*/
     case '^':
         v = pow(evalAux(a->l), evalAux(a->r));
         break; /*Operações*/
