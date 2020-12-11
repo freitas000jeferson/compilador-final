@@ -2,6 +2,7 @@ BEGIN::
     float c,
     m, j,
     t, i;
+float c;
 print("=================", endl::,
       "Problema de juros", endl::,
       "=================", endl::);

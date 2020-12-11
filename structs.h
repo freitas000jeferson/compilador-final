@@ -719,50 +719,141 @@ double eval(Ast *a)
 
     // ------
     case 'V': //float
-        l1 = ins_f(l1, ((Varval *)a)->var);
+        // tratar com if verificando se o var ja existe
+        aux1 = srch(l1, ((Varval *)a)->var);
+        if (aux1 == NULL)
+        {
+            l1 = ins_f(l1, ((Varval *)a)->var);
+        }
+        else
+        {
+            printf("Redeclaração de variável: %s\n", ((Varval *)a)->var);
+            exit(0);
+        }
         // printf("entrou aqui:::%s\n", ((VARI *)l1)->name);
         break;
     case 'U': //int
-        l1 = ins_i(l1, ((Varval *)a)->var);
+        aux1 = srch(l1, ((Varval *)a)->var);
+        if (aux1 == NULL)
+        {
+            l1 = ins_i(l1, ((Varval *)a)->var);
+        }
+        else
+        {
+            printf("Redeclaração de variável: %s\n", ((Varval *)a)->var);
+            exit(0);
+        }
         break;
     case 'X': //string
         // printf("criour var STR: %s\n", ((Varval *)a)->var);
-        l1 = ins_s(l1, ((Varval *)a)->var);
+        aux1 = srch(l1, ((Varval *)a)->var);
+        if (aux1 == NULL)
+        {
+            l1 = ins_s(l1, ((Varval *)a)->var);
+        }
+        else
+        {
+            printf("Redeclaração de variável: %s\n", ((Varval *)a)->var);
+            exit(0);
+        }
         break;
     case 'A': // vetor
-        value = eval(((Varval *)a)->length);
-        l1 = ins_a(l1, ((Varval *)a)->var, (int)value);
+        aux1 = srch(l1, ((Varval *)a)->var);
+        if (aux1 == NULL)
+        {
+            value = eval(((Varval *)a)->length);
+            l1 = ins_a(l1, ((Varval *)a)->var, (int)value);
+        }
+        else
+        {
+            printf("Redeclaração de variável: %s\n", ((Varval *)a)->var);
+            exit(0);
+        }
         break;
         // -----------
 
     case 'D': //declarar e inserir float
-        v = eval(a->r);
-        l1 = ins_f(l1, ((Symasgn *)(a->l))->s);
-        l1->valor = v;
+        aux1 = srch(l1, ((Varval *)a)->var);
+        if (aux1 == NULL)
+        {
+            v = eval(a->r);
+            l1 = ins_f(l1, ((Symasgn *)(a->l))->s);
+            l1->valor = v;
+        }
+        else
+        {
+            printf("Redeclaração de variável: %s\n", ((Varval *)a)->var);
+            exit(0);
+        }
         break;
     case 'd': //declarar varios float
-        l1 = ins_f(l1, ((Symasgn *)(a->l))->s);
-        eval(a->r);
+        aux1 = srch(l1, ((Varval *)a)->var);
+        if (aux1 == NULL)
+        {
+            l1 = ins_f(l1, ((Symasgn *)(a->l))->s);
+            eval(a->r);
+        }
+        else
+        {
+            printf("Redeclaração de variável: %s\n", ((Varval *)a)->var);
+            exit(0);
+        }
         break;
 
     case 'G': //declarar e inserir int
-        v = eval(a->r);
-        l1 = ins_i(l1, ((Symasgn *)(a->l))->s);
-        l1->valor = v;
+        aux1 = srch(l1, ((Varval *)a)->var);
+        if (aux1 == NULL)
+        {
+            v = eval(a->r);
+            l1 = ins_i(l1, ((Symasgn *)(a->l))->s);
+            l1->valor = v;
+        }
+        else
+        {
+            printf("Redeclaração de variável: %s\n", ((Varval *)a)->var);
+            exit(0);
+        }
         break;
     case 'g': //declarar varios int
-        l1 = ins_i(l1, ((Symasgn *)(a->l))->s);
-        eval(a->r);
+        aux1 = srch(l1, ((Varval *)a)->var);
+        if (aux1 == NULL)
+        {
+            l1 = ins_i(l1, ((Symasgn *)(a->l))->s);
+            eval(a->r);
+        }
+        else
+        {
+            printf("Redeclaração de variável: %s\n", ((Varval *)a)->var);
+            exit(0);
+        }
         break;
 
     case 'H': //declarar e inserir string
         // printf("AQUI OOOHHH: %s, %s\n", ((Symasgn *)(a->l))->s, ((Varval *)a->r)->var);
-        l1 = ins_s(l1, (((Symasgn *)(a->l))->s));
-        strcpy(l1->valors, ((Varval *)a->r)->var);
+        aux1 = srch(l1, ((Varval *)a)->var);
+        if (aux1 == NULL)
+        {
+            l1 = ins_s(l1, (((Symasgn *)(a->l))->s));
+            strcpy(l1->valors, ((Varval *)a->r)->var);
+        }
+        else
+        {
+            printf("Redeclaração de variável: %s\n", ((Varval *)a)->var);
+            exit(0);
+        }
         break;
     case 'h': //declarar varios string
-        l1 = ins_s(l1, ((Symasgn *)(a->l))->s);
-        eval(a->r);
+        aux1 = srch(l1, ((Varval *)a)->var);
+        if (aux1 == NULL)
+        {
+            l1 = ins_s(l1, ((Symasgn *)(a->l))->s);
+            eval(a->r);
+        }
+        else
+        {
+            printf("Redeclaração de variável: %s\n", ((Varval *)a)->var);
+            exit(0);
+        }
         break;
     case '@':
         v2 = parseSTR(((Symasgn *)a)->v);
